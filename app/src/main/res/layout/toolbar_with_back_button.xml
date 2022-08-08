@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?actionBarSize"
+    android:background="@color/lightBlack">
+
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:src="@drawable/abc_vector_test"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/iv_share"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_launcher_background"
+        app:tint="@color/white" />
+
+    <ImageView
+        android:id="@+id/iv_download"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toStartOf="@+id/iv_share"
+        android:padding="12dp"
+        android:src="@drawable/abc_vector_test"
+        app:tint="@color/white" />
+
+    <LinearLayout
+        android:id="@+id/iv_repost"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_toStartOf="@+id/iv_download"
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:src="@drawable/abc_vector_test"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="abc"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</RelativeLayout>
+

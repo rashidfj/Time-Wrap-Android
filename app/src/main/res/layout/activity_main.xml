@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    tools:context="com.peek.time.wrap.scan.timewrap.MainActivity">
+
+    <RelativeLayout
+        android:background="@color/colorAccent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/toolbar_with_back_button" />
+
+        <com.peek.time.wrap.scan.timewrap.helpers.CameraScreen
+            android:id="@+id/camera_view"
+            android:layout_marginTop="?actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <com.peek.time.wrap.scan.timewrap.helpers.ScanLine
+            android:id="@+id/scanningView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="?actionBarSize" />
+
+
+        <TextView
+            android:background="@drawable/circle_back_ground"
+            android:layout_marginBottom="30dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:text="Start"
+            android:textColor="@color/black"
+            android:textAllCaps="true"
+            android:gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:onClick="onScan"/>
+
+    </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
