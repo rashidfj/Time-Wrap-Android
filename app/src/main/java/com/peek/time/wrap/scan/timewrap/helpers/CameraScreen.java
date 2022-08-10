@@ -21,6 +21,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.PermissionChecker;
@@ -56,7 +57,8 @@ public class CameraScreen extends SurfaceView {
     private boolean isf = false;
     private float scanHeight;
     private float pixelHeight;
-
+    private int cameraPosition = 1;
+    HandlerThread handlerThread;
 
     public boolean isScanVideo() {
         return isScan;
@@ -66,8 +68,9 @@ public class CameraScreen extends SurfaceView {
         isScan = scan;
     }
 
-    public CameraScreen(Context context) {
+    public CameraScreen(Context context,int cameraPosition) {
         super(context);
+        this.cameraPosition = cameraPosition;
         init();
     }
 
@@ -76,18 +79,25 @@ public class CameraScreen extends SurfaceView {
         init();
     }
 
-    private void init(){
+    public void init(){
+        if (cameraThread != null) {
+            videoRenderer.release();
+            mRenderer.release();
+            scanRenderer.release();
+            mEglUtils.release();
+        }
         cameraThread = new HandlerThread("Camera2Thread");
         cameraThread.start();
         cameraHandler = new Handler(cameraThread.getLooper());
 
-        initCamera2();
+        initCamera2(cameraPosition);
         getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder surfaceHolder) {
                 cameraHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        Toast.makeText(getContext(), "test", Toast.LENGTH_SHORT).show();
                         mEglUtils.initEGL(getHolder().getSurface());
                         GLES20.glEnable(GLES20.GL_BLEND);
                         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
@@ -103,7 +113,11 @@ public class CameraScreen extends SurfaceView {
                                         if(mCameraCaptureSession == null){
                                             return;
                                         }
-                                        videoRenderer.drawFrame();
+                                        try {
+                                            videoRenderer.drawFrame();
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                         int videoTexture = videoRenderer.getTexture();
                                         if(isScan){
                                             if(!isf){
@@ -184,6 +198,7 @@ public class CameraScreen extends SurfaceView {
                 cameraHandler.post(new Runnable() {
                     @Override
                     public void run() {
+                        Toast.makeText(getContext(), "desto", Toast.LENGTH_SHORT).show();
                         if(mCameraCaptureSession != null){
                             mCameraCaptureSession.getDevice().close();
                             mCameraCaptureSession.close();
@@ -201,15 +216,15 @@ public class CameraScreen extends SurfaceView {
     }
 
     private Size[] mSizes;
-    private void initCamera2() {
-        HandlerThread handlerThread = new HandlerThread("Camera2");
+    public void initCamera2(int cameraPosition) {
+        handlerThread = new HandlerThread("Camera2");
         handlerThread.start();
         mHandler = new Handler(handlerThread.getLooper());
         mCameraManager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
             assert mCameraManager != null;
             String[] CameraIdList = mCameraManager.getCameraIdList();
-            mCameraId = CameraIdList[1];
+            mCameraId = CameraIdList[cameraPosition];
             CameraCharacteristics characteristics = mCameraManager.getCameraCharacteristics(mCameraId);
             characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);

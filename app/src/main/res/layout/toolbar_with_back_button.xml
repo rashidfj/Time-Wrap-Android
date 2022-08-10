@@ -8,11 +8,11 @@
 
 
     <ImageView
-        android:id="@+id/iv_back"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:id="@+id/iv_timer_slider"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
         android:padding="10dp"
-        android:src="@drawable/abc_vector_test"
+        android:src="@drawable/ic_speed_slider"
         app:tint="@color/white" />
 
     <ImageView

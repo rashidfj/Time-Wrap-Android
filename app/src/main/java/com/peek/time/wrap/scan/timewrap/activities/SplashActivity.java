@@ -31,12 +31,9 @@ public class SplashActivity extends AppCompatActivity {
                     public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
                         if (multiplePermissionsReport.areAllPermissionsGranted()) {
                             final Handler handler = new Handler();
-                            handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    startActivity(new Intent(SplashActivity.this,MainActivity.class));
-                                    finish();
-                                }
+                            handler.postDelayed(() -> {
+                                startActivity(new Intent(SplashActivity.this,MainActivity.class));
+                                finish();
                             }, 3000);
                         }
 //                        if (multiplePermissionsReport.isAnyPermissionPermanentlyDenied()) {
