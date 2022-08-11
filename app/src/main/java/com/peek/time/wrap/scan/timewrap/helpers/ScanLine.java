@@ -90,7 +90,6 @@ public class ScanLine extends View {
     }
 
     private void refreshView() {
-        //Update new position of the line
         if (isGoingDown) {
             mPosY += Constant.speed/2.8;
             if (mPosY > getHeight()){
