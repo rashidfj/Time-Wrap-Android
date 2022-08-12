@@ -5,8 +5,9 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="lightBlack">#636363</color>
+    <color name="lightBlack">#393737</color>
     <color name="yellow">#FFEB3B</color>
     <color name="transparent">#00000000</color>
     <color name="green">#2AA300</color>
+    <color name="blurryBackground">#65000000</color>
 </resources>

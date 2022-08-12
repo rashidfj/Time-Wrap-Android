@@ -2,6 +2,7 @@ package com.peek.time.wrap.scan.timewrap;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,13 +12,18 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
+import android.util.Log;
 import android.util.Size;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -81,9 +87,8 @@ public class MainActivity extends AppCompatActivity {
     Bitmap subBitmap = null;
     public WARP_DIRECTION warpDirection = WARP_DIRECTION.DOWN;
     private String direction = "horizontal";
-
-
-
+    private int brightness = 0;
+    private boolean isSeekBarTracking = false;
 
 
     public enum WARP_DIRECTION {
@@ -93,8 +98,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     ActivityMainBinding binding;
-
-
 
 
     @Override
@@ -125,36 +128,81 @@ public class MainActivity extends AppCompatActivity {
             binding.verticalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.selected_ort_bg)));
         }
 
-
+        brightness = Settings.System.getInt(MainActivity.this.getContentResolver(),
+                Settings.System.SCREEN_BRIGHTNESS, 0);
 
     }
 
 
     private void changeListeners() {
         listener = index -> {
-            frameRate = 60 - ((index+1) * 10);
+            frameRate = 120 - ((index + 1) * 20);
             handler.postDelayed(() -> {
                 binding.rangeID.setVisibility(View.INVISIBLE);
             }, 3000);
         };
+
+
+        binding.seekBar.setProgress(brightness);
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Settings.System.putInt(getContentResolver(),
+                        Settings.System.SCREEN_BRIGHTNESS, progress);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                isSeekBarTracking = true;
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                isSeekBarTracking = false;
+                    handler.postDelayed(() -> {
+                        if (!isSeekBarTracking) {
+                            binding.seekBarContainer.setVisibility(View.INVISIBLE);
+                        }
+                    }, 3000);
+
+            }
+        });
     }
 
     private void clickListeners() {
         binding.rangeID.setOnSlideListener(listener);
         binding.peekIdSubToolbar.ivTimerSlider.setOnClickListener(view -> binding.rangeID.setVisibility(View.VISIBLE));
+        binding.peekIdSubToolbar.ivBrightness.setOnClickListener(view -> {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (Settings.System.canWrite(this)) {
+                    binding.seekBarContainer.setVisibility(View.VISIBLE);
+                }else {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    intent.setData(Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                }
+
+
+            }
+
+        });
 
         binding.startStopText.setOnClickListener(view -> {
-//            binding.rangeID.setVisibility(View.INVISIBLE);
+            binding.rangeID.setVisibility(View.INVISIBLE);
             startScanning();
         });
 
         binding.verticalBtn.setOnClickListener(view -> {
+            binding.horizontalBtn.setTextColor(getResources().getColor(R.color.yellow));
+            binding.verticalBtn.setTextColor(getResources().getColor(R.color.black));
             binding.horizontalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg)));
             binding.verticalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.selected_ort_bg)));
             direction = "vertical";
         });
 
         binding.horizontalBtn.setOnClickListener(view -> {
+            binding.horizontalBtn.setTextColor(getResources().getColor(R.color.black));
+            binding.verticalBtn.setTextColor(getResources().getColor(R.color.yellow));
             binding.horizontalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.selected_ort_bg)));
             binding.verticalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg)));
             direction = "horizontal";
@@ -179,10 +227,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     private void startScanning() {
         Dexter.withContext(MainActivity.this)
                 .withPermissions(Manifest.permission.CAMERA, Manifest.permission.INTERNET)
@@ -194,6 +238,8 @@ public class MainActivity extends AppCompatActivity {
                             if (binding.peekIdBottomLl.getVisibility() == View.VISIBLE) {
                                 if (direction.equals("horizontal")) {
                                     try {
+                                        binding.horizontalBtn.setTextColor(getResources().getColor(R.color.black));
+                                        binding.verticalBtn.setTextColor(getResources().getColor(R.color.yellow));
                                         binding.horizontalBtn.setBackground(getTintedDrawable(getResources(), R.drawable.selected_ort_bg));
                                         binding.verticalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg)));
                                         startCapture(WARP_DIRECTION.RIGHT);
@@ -202,7 +248,8 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 } else if (direction.equals("vertical")) {
                                     try {
-
+                                        binding.horizontalBtn.setTextColor(getResources().getColor(R.color.yellow));
+                                        binding.verticalBtn.setTextColor(getResources().getColor(R.color.black));
                                         binding.verticalBtn.setBackground(getTintedDrawable(getResources(), R.drawable.selected_ort_bg));
                                         binding.horizontalBtn.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg));
 
@@ -338,7 +385,7 @@ public class MainActivity extends AppCompatActivity {
         paint.setStrokeWidth(5.0f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             paint.setColor(getColor(R.color.yellow));
-        }else {
+        } else {
             paint.setColor(-1);
         }
         if (warp_direction == WARP_DIRECTION.DOWN) {
@@ -350,7 +397,6 @@ public class MainActivity extends AppCompatActivity {
         }
         canvas.drawBitmap(bitmap, 0.0f, 0.0f, (Paint) null);
     }
-
 
 
     public void initializeImageView() {
@@ -379,7 +425,6 @@ public class MainActivity extends AppCompatActivity {
     private void hideResultUI() {
         binding.peekIdResultLl.setVisibility(View.INVISIBLE);
     }
-
 
 
     public Drawable getTintedDrawable(Resources resources, int i) {
@@ -448,66 +493,66 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-public class ImageCapture implements ImageAnalysis.Analyzer {
-    private ImageCapture() {
-    }
+    public class ImageCapture implements ImageAnalysis.Analyzer {
+        private ImageCapture() {
+        }
 
-    @SuppressLint("UnsafeOptInUsageError")
-    public void analyze(ImageProxy imageProxy) {
-        Bitmap bitmap;
-        if (binding.peekIdPreview.getPreviewStreamState().getValue() == PreviewView.StreamState.STREAMING && binding.peekIdPreview.getChildAt(0).getClass() == TextureView.class) {
-            bitmap = ((TextureView) binding.peekIdPreview.getChildAt(0)).getBitmap(MainActivity.this.resolutionX, MainActivity.this.resolutionY);
-        } else if (imageProxy.getFormat() == 35) {
-            MainActivity mainActivity = MainActivity.this;
-            bitmap = mainActivity.rotateBitmap(mainActivity.toBitmap(imageProxy.getImage()), 90);
-            if (MainActivity.this.facing == 0) {
-                bitmap = MainActivity.MirrorBitmap(bitmap, 1, -1);
+        @SuppressLint("UnsafeOptInUsageError")
+        public void analyze(ImageProxy imageProxy) {
+            Bitmap bitmap;
+            if (binding.peekIdPreview.getPreviewStreamState().getValue() == PreviewView.StreamState.STREAMING && binding.peekIdPreview.getChildAt(0).getClass() == TextureView.class) {
+                bitmap = ((TextureView) binding.peekIdPreview.getChildAt(0)).getBitmap(MainActivity.this.resolutionX, MainActivity.this.resolutionY);
+            } else if (imageProxy.getFormat() == 35) {
+                MainActivity mainActivity = MainActivity.this;
+                bitmap = mainActivity.rotateBitmap(mainActivity.toBitmap(imageProxy.getImage()), 90);
+                if (MainActivity.this.facing == 0) {
+                    bitmap = MainActivity.MirrorBitmap(bitmap, 1, -1);
+                }
+            } else {
+                bitmap = null;
             }
-        } else {
-            bitmap = null;
-        }
-        if (bitmap == null) {
-            imageProxy.close();
-            return;
-        }
-        if ((MainActivity.this.lineCount >= MainActivity.this.resolutionY || MainActivity.this.warpDirection != WARP_DIRECTION.DOWN) && !((MainActivity.this.lineCount < MainActivity.this.resolutionX && MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT && MainActivity.this.facing == 0) || (MainActivity.this.lineCount < MainActivity.this.resolutionX && MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT && MainActivity.this.facing == 1))) {
-            if (MainActivity.this.capture) {
-                MainActivity.this.stopCapture();
+            if (bitmap == null) {
+                imageProxy.close();
+                return;
             }
-        } else if (MainActivity.this.capture) {
-            long currentTimeMillis = System.currentTimeMillis();
-            if (MainActivity.this.resultBitmap == null) {
-                MainActivity.this.initializeImageView();
-            }
-            if (MainActivity.this.resultBitmapList == null) {
-                MainActivity.this.resultBitmapList = new ArrayList();
-            }
-            if (MainActivity.this.warpDirection == WARP_DIRECTION.DOWN) {
-                MainActivity mainActivity3 = MainActivity.this;
-                mainActivity3.subBitmap = Bitmap.createBitmap(bitmap, 0, mainActivity3.lineCount, MainActivity.this.resolutionX, MainActivity.this.lineResolution);
-            } else if (MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT) {
-                MainActivity mainActivity4 = MainActivity.this;
-                mainActivity4.subBitmap = Bitmap.createBitmap(bitmap, mainActivity4.lineCount, 0, MainActivity.this.lineResolution, MainActivity.this.resolutionY);
-            }
-            MainActivity mainActivity5 = MainActivity.this;
-            mainActivity5.resultBitmap = mainActivity5.overlay(mainActivity5.resultBitmap, MainActivity.this.subBitmap, MainActivity.this.lineCount, MainActivity.this.warpDirection);
-            binding.peekIdResultImageview.setImageBitmap(MainActivity.this.resultBitmap);
-            MainActivity mainActivity8 = MainActivity.this;
-            mainActivity8.drawScanEffect(bitmap, mainActivity8.warpDirection, MainActivity.this.lineCount);
-            MainActivity.this.lineCount += MainActivity.this.lineResolution;
-            long currentTimeMillis2 = currentTimeMillis - System.currentTimeMillis();
-            if (currentTimeMillis2 < ((long) MainActivity.this.frameRate)) {
-                try {
-                    Thread.sleep(((long) MainActivity.this.frameRate) - currentTimeMillis2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            if ((MainActivity.this.lineCount >= MainActivity.this.resolutionY || MainActivity.this.warpDirection != WARP_DIRECTION.DOWN) && !((MainActivity.this.lineCount < MainActivity.this.resolutionX && MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT && MainActivity.this.facing == 0) || (MainActivity.this.lineCount < MainActivity.this.resolutionX && MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT && MainActivity.this.facing == 1))) {
+                if (MainActivity.this.capture) {
+                    MainActivity.this.stopCapture();
+                }
+            } else if (MainActivity.this.capture) {
+                long currentTimeMillis = System.currentTimeMillis();
+                if (MainActivity.this.resultBitmap == null) {
+                    MainActivity.this.initializeImageView();
+                }
+                if (MainActivity.this.resultBitmapList == null) {
+                    MainActivity.this.resultBitmapList = new ArrayList();
+                }
+                if (MainActivity.this.warpDirection == WARP_DIRECTION.DOWN) {
+                    MainActivity mainActivity3 = MainActivity.this;
+                    mainActivity3.subBitmap = Bitmap.createBitmap(bitmap, 0, mainActivity3.lineCount, MainActivity.this.resolutionX, MainActivity.this.lineResolution);
+                } else if (MainActivity.this.warpDirection == WARP_DIRECTION.RIGHT) {
+                    MainActivity mainActivity4 = MainActivity.this;
+                    mainActivity4.subBitmap = Bitmap.createBitmap(bitmap, mainActivity4.lineCount, 0, MainActivity.this.lineResolution, MainActivity.this.resolutionY);
+                }
+                MainActivity mainActivity5 = MainActivity.this;
+                mainActivity5.resultBitmap = mainActivity5.overlay(mainActivity5.resultBitmap, MainActivity.this.subBitmap, MainActivity.this.lineCount, MainActivity.this.warpDirection);
+                binding.peekIdResultImageview.setImageBitmap(MainActivity.this.resultBitmap);
+                MainActivity mainActivity8 = MainActivity.this;
+                mainActivity8.drawScanEffect(bitmap, mainActivity8.warpDirection, MainActivity.this.lineCount);
+                MainActivity.this.lineCount += MainActivity.this.lineResolution;
+                long currentTimeMillis2 = currentTimeMillis - System.currentTimeMillis();
+                if (currentTimeMillis2 < ((long) MainActivity.this.frameRate)) {
+                    try {
+                        Thread.sleep(((long) MainActivity.this.frameRate) - currentTimeMillis2);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            binding.peekIdPreviewImageview.setImageBitmap(bitmap);
+            imageProxy.close();
         }
-        binding.peekIdPreviewImageview.setImageBitmap(bitmap);
-        imageProxy.close();
     }
-}
 
 
     public void stopCapture() {
@@ -518,11 +563,11 @@ public class ImageCapture implements ImageAnalysis.Analyzer {
     }
 
     public void onBackPressed() {
-       if (binding.peekIdBottomLl.getVisibility() == View.VISIBLE) {
-           finish();
-        }else {
-           resumeToBeforeCaptureUI();
-       }
+        if (binding.peekIdBottomLl.getVisibility() == View.VISIBLE) {
+            finish();
+        } else {
+            resumeToBeforeCaptureUI();
+        }
     }
 
     public void onResume() {

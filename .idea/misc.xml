@@ -3,9 +3,15 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/animate_background.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/animate_background_reverrse.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/backgound_round_corner.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/backgound_round_corner_view_splash.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/circle_back_ground.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_done.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_flip_camera.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/seekbar_drawable_progress.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/seekbar_drawable_thumb.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/selected_ort_bg.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/unselected_ort_bg.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_main.xml" value="0.16576086956521738" />

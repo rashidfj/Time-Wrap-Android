@@ -1,59 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="?actionBarSize"
-    android:background="@color/yellow">
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="20dp"
+    android:background="@drawable/backgound_round_corner">
 
 
     <ImageView
-        android:id="@+id/iv_timer_slider"
-        android:layout_width="60dp"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
         android:padding="10dp"
         android:src="@drawable/ic_speed_slider"
-        app:tint="@color/white" />
+       />
 
     <ImageView
-        android:id="@+id/iv_share"
+        android:id="@+id/iv_brightness"
         android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
-        android:padding="12dp"
-        android:src="@drawable/ic_launcher_background"
-        app:tint="@color/white" />
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:src="@drawable/ic_brightness"
+       />
 
     <ImageView
-        android:id="@+id/iv_download"
+        android:id="@+id/iv_timer_slider"
         android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_toStartOf="@+id/iv_share"
-        android:padding="12dp"
-        android:src="@drawable/abc_vector_test"
-        app:tint="@color/white" />
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:src="@drawable/ic_speed_slider"
+       />
 
-    <LinearLayout
-        android:id="@+id/iv_repost"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_toStartOf="@+id/iv_download"
-        android:orientation="vertical"
-        tools:ignore="UseCompoundDrawables">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="25dp"
-            android:src="@drawable/abc_vector_test"
-            app:tint="@color/white" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="abc"
-            android:textColor="@color/white" />
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>
 
