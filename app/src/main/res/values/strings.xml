@@ -3,4 +3,5 @@
     <string name="start">Start</string>
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
+    <string name="delete">delete</string>
 </resources>

@@ -6,7 +6,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.widget.TextView;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -32,7 +31,7 @@ public class SplashActivity extends AppCompatActivity {
                         if (multiplePermissionsReport.areAllPermissionsGranted()) {
                             final Handler handler = new Handler();
                             handler.postDelayed(() -> {
-                                startActivity(new Intent(SplashActivity.this,MainActivity.class));
+                                startActivity(new Intent(SplashActivity.this, MainActivity.class));
                                 finish();
                             }, 3000);
                         }
