@@ -33,7 +33,7 @@ public class SplashActivity extends AppCompatActivity {
                             handler.postDelayed(() -> {
                                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                                 finish();
-                            }, 3000);
+                            }, 5000);
                         }
 //                        if (multiplePermissionsReport.isAnyPermissionPermanentlyDenied()) {
 //

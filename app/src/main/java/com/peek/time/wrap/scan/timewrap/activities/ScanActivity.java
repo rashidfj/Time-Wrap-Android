@@ -46,7 +46,6 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.peek.time.wrap.scan.timewrap.R;
-import com.peek.time.wrap.scan.timewrap.databinding.ActivityMainBinding;
 import com.peek.time.wrap.scan.timewrap.databinding.ActivityScanBinding;
 import com.peek.time.wrap.scan.timewrap.utils.Utils;
 
@@ -208,11 +207,11 @@ public class ScanActivity extends AppCompatActivity {
         });
 
         binding.peekIdSavedImages.setOnClickListener(view -> {
-//            Intent intent = new Intent(getApplicationContext(), SavedActivity.class);
-//            startActivity(intent);
+            Intent intent = new Intent(getApplicationContext(), SavedImagesActivity.class);
+            startActivity(intent);
         });
 
-        binding.switchCamera.setOnClickListener(ScanActivity.this::lambda$onCreate$6$MainActivity);
+        binding.switchCamera.setOnClickListener(ScanActivity.this::CameraSwitching);
         binding.peekIdResultCancel.setOnClickListener(ScanActivity.this::cancelButtonFunctions);
 
         binding.peekIdResultSave.setOnClickListener(view -> {
@@ -289,8 +288,8 @@ public class ScanActivity extends AppCompatActivity {
             e.printStackTrace();
         } finally {
             try {
+                assert fos != null;
                 fos.close();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -315,7 +314,7 @@ public class ScanActivity extends AppCompatActivity {
         resumeToBeforeCaptureUI();
     }
 
-    public void lambda$onCreate$6$MainActivity(View view) {
+    public void CameraSwitching(View view) {
         this.isSwitching = true;
         if (this.facing == 0) {
             setFacing(1);

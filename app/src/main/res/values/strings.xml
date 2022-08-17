@@ -4,4 +4,5 @@
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
     <string name="delete">delete</string>
+    <string name="select_all">Select All</string>
 </resources>

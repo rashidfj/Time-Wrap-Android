@@ -28,8 +28,6 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
 import com.peek.time.wrap.scan.timewrap.R;
 import com.peek.time.wrap.scan.timewrap.activities.SavedImagesActivity;
 import com.peek.time.wrap.scan.timewrap.model.LiveDataModel;
@@ -39,12 +37,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
+public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> {
 
 
     private final List<SavedModel> imagesList;
     private Context context;
-    LinearLayout messageTextvideo;
 
 
     LiveDataModel savedMainViewModel;
@@ -55,10 +52,9 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
     MenuItem menu_select_all;
 
 
-    public SavedAdapter(List<SavedModel> imagesList, Context context, LinearLayout messageTextvideo) {
+    public SavedAdapter(List<SavedModel> imagesList, Context context) {
         this.imagesList = imagesList;
         this.context = context;
-        this.messageTextvideo = messageTextvideo;
     }
 
     @NonNull
@@ -76,20 +72,15 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
     public void onBindViewHolder(@NonNull viewHolder holder, @SuppressLint("RecyclerView") int position) {
 
         final SavedModel status = imagesList.get(holder.getAdapterPosition());
-        String name = status.getTitle();
         context = holder.itemView.getContext();
 
-        if (status.isVideo())
-            Glide.with(context).asBitmap().load(status.getFile()).into(holder.img_thumb);
-        else
-            Picasso.get().load(status.getFile()).into(holder.img_thumb);
+        Picasso.get().load(status.getFile()).into(holder.img_thumb);
 
         holder.img_thumb.setOnClickListener(v -> {
 
             if (isEnable) {
                 SavedClickItem(holder, null);
-            }
-            else {
+            } else {
 //                Intent intent = new Intent(context, ImageFullView.class);
 //                intent.putExtra("img", imagesList.get(position).getPath());
 //                intent.putExtra("nam", name);
@@ -97,7 +88,6 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
 
             }
         });
-
 
 
         holder.img_share.setOnClickListener(new View.OnClickListener() {
@@ -123,9 +113,6 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
                 if (status.getFile().delete()) {
                     imagesList.remove(position);
                     notifyDataSetChanged();
-                    if (imagesList.size() == 0) {
-                        messageTextvideo.setVisibility(View.VISIBLE);
-                    }
                     Toast.makeText(context, "File Deleted", Toast.LENGTH_SHORT).show();
                 } else
                     Toast.makeText(context, "Unable to Delete File", Toast.LENGTH_SHORT).show();
@@ -147,19 +134,17 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
             @Override
             public boolean onLongClick(View view) {
 
-                Log.d("Imageclicked123","clicked");
+                Log.d("Imageclicked123", "clicked");
 
 
                 if (!isEnable) {
-
-                    ActionMode.Callback callback=new ActionMode.Callback() {
+                    ActionMode.Callback callback = new ActionMode.Callback() {
                         @Override
                         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 
                             MenuInflater menuInflater = actionMode.getMenuInflater();
                             menuInflater.inflate(R.menu.menu_main, menu);
                             SavedImagesActivity.statusActionMode = actionMode;
-
                             return true;
                         }
 
@@ -174,19 +159,12 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
                                     , new Observer<String>() {
                                         @Override
                                         public void onChanged(String s) {
-                                            actionMode.setTitle(String.format("%s Selected", s));
+                                            actionMode.setTitle(String.format("%s Selected", s+"/"+imagesList.size()));
 
                                             if (selectedItems.isEmpty()) {
                                                 menu_select_all.setVisible(true);
-
                                             } else {
-
-                                                if (selectedItems.size() == imagesList.size()) {
-                                                    menu_select_all.setVisible(false);
-                                                } else {
-                                                    menu_select_all.setVisible(true);
-
-                                                }
+                                                menu_select_all.setVisible(selectedItems.size() != imagesList.size());
                                             }
 
                                         }
@@ -198,64 +176,61 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
                         @Override
                         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                             int id = menuItem.getItemId();
-//                            switch (id) {
-//                                case R.id.action_delete:
-//
-//                                    androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(
-//                                            new ContextThemeWrapper(context, R.style.CustomAlertDialog));
-//
-//                                    alert.setTitle("Delete");
-//                                    alert.setMessage("Are you sure you want to delete the selected item ?");
-//                                    alert.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-//
-//                                        public void onClick(DialogInterface dialog, int which) {
-//                                            for (SavedModel s : selectedItems) {
-//                                                imagesList.remove(s);
-//                                                s.getFile().delete();
-//                                                notifyDataSetChanged();
-//                                            }
-//                                            if (imagesList.size() == 0) {
-//                                                messageTextvideo.setVisibility(View.VISIBLE);
-//                                            }
-//                                            if (actionMode != null) {
-//                                                actionMode.finish();
-//                                            }
-//
-//                                        }
-//                                    });
-//                                    alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-//                                        public void onClick(DialogInterface dialog, int which) {
-//                                            // close dialog
-//                                            dialog.cancel();
-//                                            if (actionMode != null) {
-//                                                actionMode.finish();
-//                                            }
-//                                        }
-//                                    });
-//                                    alert.show();
-//                                    break;
-//
-//
-//                                case R.id.menu_select_all:
-//                                    if (selectedItems.size() == imagesList.size()) {
-//                                        isSelectAll = false;
-//                                        selectedItems.clear();
-//                                        savedSelectedItemsIds.clear();
-//                                    } else {
-//                                        isSelectAll = true;
-//                                        selectedItems.clear();
-//                                        selectedItems.addAll(imagesList);
-//                                        for (int i = 0; i < imagesList.size(); i++) {
-//                                            savedSelectedItemsIds.put(i, true);
-//                                        }
-//                                        menu_select_all.setVisible(false);
-//                                        /*      menu_select_all_2.setVisible(true);*/
-//                                    }
-//                                    savedMainViewModel.setText(String.valueOf(selectedItems.size()));
-//                                    notifyDataSetChanged();
-//                                    break;
-//
-//                            }
+                            switch (id) {
+                                case R.id.action_delete:
+
+                                    androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(
+                                            new ContextThemeWrapper(context, R.style.CustomAlertDialog));
+
+                                    alert.setTitle("Delete");
+                                    alert.setMessage("Are you sure you want to delete the selected item ?");
+                                    alert.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            for (SavedModel s : selectedItems) {
+                                                imagesList.remove(s);
+                                                s.getFile().delete();
+                                                notifyDataSetChanged();
+                                            }
+                                            if (actionMode != null) {
+                                                actionMode.finish();
+                                            }
+
+                                        }
+                                    });
+                                    alert.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // close dialog
+                                            dialog.cancel();
+                                            if (actionMode != null) {
+                                                actionMode.finish();
+                                            }
+                                        }
+                                    });
+                                    alert.show();
+                                    break;
+
+
+                                case R.id.menu_select_all:
+                                    if (selectedItems.size() == imagesList.size()) {
+                                        isSelectAll = false;
+                                        selectedItems.clear();
+                                        savedSelectedItemsIds.clear();
+                                    } else {
+                                        isSelectAll = true;
+                                        selectedItems.clear();
+                                        selectedItems.addAll(imagesList);
+                                        for (int i = 0; i < imagesList.size(); i++) {
+                                            savedSelectedItemsIds.put(i, true);
+                                        }
+                                        menu_select_all.setVisible(false);
+                                        /*      menu_select_all_2.setVisible(true);*/
+                                    }
+                                    savedMainViewModel.setText(String.valueOf(selectedItems.size()));
+                                    notifyDataSetChanged();
+                                    break;
+
+                            }
 
                             return true;
                         }
@@ -268,8 +243,6 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
                             selectedItems.clear();
                             notifyDataSetChanged();
                             savedSelectedItemsIds.clear();
-
-
                         }
                     };
 
@@ -285,12 +258,12 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
 
     @Override
     public int getItemCount() {
-        return 0;
+        return imagesList.size();
     }
 
     public class viewHolder extends RecyclerView.ViewHolder {
 
-        RelativeLayout relative_whatsapp,layout_all_check;
+        RelativeLayout relative_whatsapp, layout_all_check;
         ImageView img_thumb, btn_download, img_share;
 
         public viewHolder(@NonNull View itemView) {
@@ -301,7 +274,7 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
             img_thumb = itemView.findViewById(R.id.thumb_whatsapp);
             btn_download = itemView.findViewById(R.id.download_whatsapp_btn);
             img_share = itemView.findViewById(R.id.img_share_whatsapp);
-            layout_all_check=itemView.findViewById(R.id.select_all_layout);
+            layout_all_check = itemView.findViewById(R.id.select_all_layout);
         }
     }
 
@@ -309,7 +282,7 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder>{
     private void SavedClickItem(viewHolder holder, ActionMode mode) {
 
         SavedModel s = imagesList.get(holder.getAdapterPosition());
-        if (holder.layout_all_check.getVisibility() == View.GONE ) {
+        if (holder.layout_all_check.getVisibility() == View.GONE) {
 
             holder.layout_all_check.setVisibility(View.VISIBLE);
             selectedItems.add(s);
