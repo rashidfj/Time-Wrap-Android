@@ -15,12 +15,27 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue 'string', 'application_id', "ca-app-pub-1695558713044060~1824006264"
+            resValue 'string', 'interstitial_ad_id', "ca-app-pub-1695558713044060/3875454533"
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            resValue 'string', 'application_id', "ca-app-pub-3940256099942544~3347511713"
+            resValue 'string', 'banner_ad_id', "ca-app-pub-3940256099942544/6300978111"
+            resValue 'string', 'native_ad_id', "ca-app-pub-3940256099942544/2247696110"
+            resValue 'string', 'interstitial_ad_id', "ca-app-pub-3940256099942544/1033173712"
         }
     }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -48,6 +63,10 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     def lottieVersion = "5.2.0"
     implementation "com.airbnb.android:lottie:$lottieVersion"
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
+    implementation 'org.lsposed.hiddenapibypass:hiddenapibypass:2.0'
 
 }
 

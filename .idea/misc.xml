@@ -9,22 +9,32 @@
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/backgound_round_corner_view_splash.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/bg_custom.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/circle_back_ground.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_delete.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_done.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_flip_camera.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_menu.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_rate_us.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/ic_saved.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/main_page_bg.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/nav_backgound_round_corner.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/round_corner.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/seekbar_drawable_progress.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/seekbar_drawable_thumb.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/selected_ort_bg.xml" value="0.152" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/drawable/unselected_ort_bg.xml" value="0.152" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_image_open.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_main.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_saved_images.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_scan.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/activity_splash.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/cell_saved_sdapter.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/custom_toolbar.xml" value="0.16576086956521738" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/nav_header_main.xml" value="0.16576086956521738" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/smiley_alert.xml" value="0.16576086956521738" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/toolbar_nav.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/layout/toolbar_with_back_button.xml" value="0.16576086956521738" />
         <entry key="..\:/Flutter/TimeWrap/app/src/main/res/menu/menu_main.xml" value="0.22395833333333334" />
+        <entry key="..\:/Flutter/TimeWrap/app/src/main/res/xml/provider_paths.xml" value="0.1598731884057971" />
       </map>
     </option>
   </component>

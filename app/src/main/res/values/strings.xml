@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">Time Wrap</string>
+    <string name="app_name">Time Warp</string>
     <string name="start">Start</string>
     <string name="horizontal">Horizontal</string>
     <string name="vertical">Vertical</string>
     <string name="delete">delete</string>
     <string name="select_all">Select All</string>
+    <string name="todo">TODO</string>
+    <string name="rate_us">Rate us</string>
+    <string name="more_apps">More Apps</string>
+    <string name="share_app">Share App</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="more_apps_link">https://play.google.com/store/apps/developer?id=Peek+International</string>
+    <string name="privacy_policy_link">https://peekhelpers.com/time-warp-scan/privacy-policy</string>
 </resources>

@@ -46,6 +46,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.peek.time.wrap.scan.timewrap.R;
+import com.peek.time.wrap.scan.timewrap.ads.Int_AD_TWS;
 import com.peek.time.wrap.scan.timewrap.databinding.ActivityScanBinding;
 import com.peek.time.wrap.scan.timewrap.utils.Utils;
 
@@ -219,6 +220,7 @@ public class ScanActivity extends AppCompatActivity {
             saveToInternalStorage(resultBitmap, fileTitle);
             Toast.makeText(ScanActivity.this, "Photo Saved", Toast.LENGTH_SHORT).show();
             cancelButtonFunctions(view);
+            Int_AD_TWS.getInstance(this).showAd_WA(ScanActivity.this);
         });
         this.resultBitmapList = new ArrayList();
         this.resolutionY = 640;

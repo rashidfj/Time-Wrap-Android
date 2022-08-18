@@ -11,4 +11,11 @@
     <color name="transparent">#00000000</color>
     <color name="green">#2AA300</color>
     <color name="blurryBackground">#65000000</color>
+
+    <color name="item_1">#00faba20</color>
+    <color name="item_2">#10faba20</color>
+    <color name="item_3">#20faba20</color>
+    <color name="item_4">#30faba20</color>
+    <color name="item_5">#40faba20</color>
+
 </resources>

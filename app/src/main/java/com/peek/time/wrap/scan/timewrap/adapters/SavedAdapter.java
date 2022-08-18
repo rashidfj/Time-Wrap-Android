@@ -29,6 +29,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import com.peek.time.wrap.scan.timewrap.R;
+import com.peek.time.wrap.scan.timewrap.activities.ImageOpenActivity;
 import com.peek.time.wrap.scan.timewrap.activities.SavedImagesActivity;
 import com.peek.time.wrap.scan.timewrap.model.LiveDataModel;
 import com.peek.time.wrap.scan.timewrap.model.SavedModel;
@@ -81,28 +82,22 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
             if (isEnable) {
                 SavedClickItem(holder, null);
             } else {
-//                Intent intent = new Intent(context, ImageFullView.class);
-//                intent.putExtra("img", imagesList.get(position).getPath());
-//                intent.putExtra("nam", name);
-//                context.startActivity(intent);
-
+                Intent intent = new Intent(context, ImageOpenActivity.class);
+                intent.putExtra("STR_IMAGE", imagesList.get(position).getPath());
+                context.startActivity(intent);
             }
         });
 
 
-        holder.img_share.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        holder.img_share.setOnClickListener(view -> {
 
-                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                StrictMode.setVmPolicy(builder.build());
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/jpeg");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + status.getFile().getAbsolutePath()));
+            context.startActivity(Intent.createChooser(shareIntent, "Share with"));
 
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("image/jpeg");
-                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + status.getFile().getAbsolutePath()));
-                context.startActivity(Intent.createChooser(shareIntent, "Share with"));
-
-            }
         });
 
 

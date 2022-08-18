@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="rate_us">Rate us</string>
+    <string name="more_apps">More Apps</string>
+    <string name="share_app">Share App</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="more_apps_link">\"https://play.google.com/store/apps/developer?id=Peek+International\"</string>
+    <string name="privacy_policy_link">https://peekhelpers.com/time-warp-scan/privacy-policy</string>
+</resources>
