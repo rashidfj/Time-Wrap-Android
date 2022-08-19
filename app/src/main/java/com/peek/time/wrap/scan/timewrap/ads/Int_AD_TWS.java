@@ -96,7 +96,7 @@ public class Int_AD_TWS {
             if (!Constant.isPremiumUser) {
                 if (mInterstitialAd_TWS != null) {
                     TWS_count += 1;
-                    if (TWS_count % 1 == 0) {
+                    if (TWS_count % 2 == 0) {
                         mInterstitialAd_TWS.show(activity);
                     }
                 }

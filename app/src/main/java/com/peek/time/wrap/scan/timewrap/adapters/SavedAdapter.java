@@ -4,8 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -17,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -28,6 +31,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.peek.time.wrap.scan.timewrap.R;
 import com.peek.time.wrap.scan.timewrap.activities.ImageOpenActivity;
 import com.peek.time.wrap.scan.timewrap.activities.SavedImagesActivity;
@@ -35,36 +39,39 @@ import com.peek.time.wrap.scan.timewrap.model.LiveDataModel;
 import com.peek.time.wrap.scan.timewrap.model.SavedModel;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> {
 
 
-    private final List<SavedModel> imagesList;
-    private Context context;
+    private final List<SavedModel> mList;
+    private Context mContext;
 
 
-    LiveDataModel savedMainViewModel;
-    boolean isEnable = false;
-    boolean isSelectAll = false;
-    List<SavedModel> selectedItems = new ArrayList<>();
-    SparseBooleanArray savedSelectedItemsIds = new SparseBooleanArray();
-    MenuItem menu_select_all;
+    LiveDataModel mLiveModel;
+    boolean isEnableTWS = false;
+    boolean isSelectedAllTWS = false;
+    List<SavedModel> selItemsTWS = new ArrayList<>();
+    SparseBooleanArray sparseBooleanArrayTWS = new SparseBooleanArray();
+    MenuItem mSelALL;
 
 
     public SavedAdapter(List<SavedModel> imagesList, Context context) {
-        this.imagesList = imagesList;
-        this.context = context;
+        this.mList = imagesList;
+        this.mContext = context;
     }
 
     @NonNull
     @Override
     public viewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.cell_saved_sdapter, parent, false);
+        mContext = parent.getContext();
+        View view = LayoutInflater.from(mContext).inflate(R.layout.cell_saved_sdapter, parent, false);
 
-        savedMainViewModel = ViewModelProviders.of((FragmentActivity) context).get(LiveDataModel.class);
+        mLiveModel = ViewModelProviders.of((FragmentActivity) mContext).get(LiveDataModel.class);
 
         return new viewHolder(view);
     }
@@ -72,94 +79,104 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, @SuppressLint("RecyclerView") int position) {
 
-        final SavedModel status = imagesList.get(holder.getAdapterPosition());
-        context = holder.itemView.getContext();
+        final SavedModel itemModel = mList.get(holder.getAdapterPosition());
+        mContext = holder.itemView.getContext();
 
-        Picasso.get().load(status.getFile()).into(holder.img_thumb);
+        Picasso.get().load(itemModel.getFile()).into(holder.ivThumb);
 
-        holder.img_thumb.setOnClickListener(v -> {
+        holder.ivThumb.setOnClickListener(v -> {
 
-            if (isEnable) {
+            if (isEnableTWS) {
                 SavedClickItem(holder, null);
             } else {
-                Intent intent = new Intent(context, ImageOpenActivity.class);
-                intent.putExtra("STR_IMAGE", imagesList.get(position).getPath());
-                context.startActivity(intent);
+                Intent intent = new Intent(mContext, ImageOpenActivity.class);
+                intent.putExtra("STR_IMAGE", mList.get(position).getPath());
+                mContext.startActivity(intent);
             }
         });
 
 
-        holder.img_share.setOnClickListener(view -> {
+        holder.ivShare.setOnClickListener(view -> {
 
-            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-            StrictMode.setVmPolicy(builder.build());
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("image/jpeg");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + status.getFile().getAbsolutePath()));
-            context.startActivity(Intent.createChooser(shareIntent, "Share with"));
+
+            try {
+//                holder.ivThumb.buildDrawingCache();
+//                Bitmap bitmap = holder.ivThumb.getDrawingCache();
+                BitmapDrawable drawable = (BitmapDrawable) holder.ivThumb.getDrawable();
+                Bitmap bitmap = drawable.getBitmap();
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+                String path = MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "Title", null);
+                Intent share = new Intent(Intent.ACTION_SEND);
+                share.setType("image/*");
+                share.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+                mContext.startActivity(Intent.createChooser(share, "Share via"));
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
 
         });
 
 
-        holder.btn_download.setOnClickListener(new View.OnClickListener() {
+        holder.btDownload.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onClick(View view) {
-
-                if (status.getFile().delete()) {
-                    imagesList.remove(position);
-                    notifyDataSetChanged();
-                    Toast.makeText(context, "File Deleted", Toast.LENGTH_SHORT).show();
-                } else
-                    Toast.makeText(context, "Unable to Delete File", Toast.LENGTH_SHORT).show();
-
+                try {
+                    if (itemModel.getFile().delete()) {
+                        mList.remove(position);
+                        notifyDataSetChanged();
+                        Toast.makeText(mContext, "Deleted", Toast.LENGTH_SHORT).show();
+                    } else
+                        Toast.makeText(mContext, "Failed", Toast.LENGTH_SHORT).show();
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
             }
         });
 
 
-        if (savedSelectedItemsIds.get(holder.getAdapterPosition(), false)) {
+        if (sparseBooleanArrayTWS.get(holder.getAdapterPosition(), false)) {
 
-            holder.layout_all_check.setVisibility(View.VISIBLE);
+            holder.selectedItem.setVisibility(View.VISIBLE);
 
         } else {
-            holder.layout_all_check.setVisibility(View.GONE);
+            holder.selectedItem.setVisibility(View.GONE);
 
         }
 
-        holder.img_thumb.setOnLongClickListener(new View.OnLongClickListener() {
+        holder.ivThumb.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-
-                Log.d("Imageclicked123", "clicked");
-
-
-                if (!isEnable) {
+                if (!isEnableTWS) {
                     ActionMode.Callback callback = new ActionMode.Callback() {
                         @Override
                         public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
 
                             MenuInflater menuInflater = actionMode.getMenuInflater();
                             menuInflater.inflate(R.menu.menu_main, menu);
-                            SavedImagesActivity.statusActionMode = actionMode;
+                            SavedImagesActivity.actionModeTWS = actionMode;
                             return true;
                         }
 
                         @Override
                         public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
-                            menu_select_all = menu.findItem(R.id.menu_select_all);
+                            mSelALL = menu.findItem(R.id.menu_select_all);
 
-                            isEnable = true;
+                            isEnableTWS = true;
                             SavedClickItem(holder, actionMode);
 
-                            savedMainViewModel.getText().observe((LifecycleOwner) context
+                            mLiveModel.getText().observe((LifecycleOwner) mContext
                                     , new Observer<String>() {
                                         @Override
                                         public void onChanged(String s) {
-                                            actionMode.setTitle(String.format("%s Selected", s+"/"+imagesList.size()));
+                                            actionMode.setTitle(String.format("%s Selected", s + "/" + mList.size()));
 
-                                            if (selectedItems.isEmpty()) {
-                                                menu_select_all.setVisible(true);
+                                            if (selItemsTWS.isEmpty()) {
+                                                mSelALL.setVisible(true);
                                             } else {
-                                                menu_select_all.setVisible(selectedItems.size() != imagesList.size());
+                                                mSelALL.setVisible(selItemsTWS.size() != mList.size());
                                             }
 
                                         }
@@ -175,15 +192,15 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
                                 case R.id.action_delete:
 
                                     androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(
-                                            new ContextThemeWrapper(context, R.style.CustomAlertDialog));
+                                            new ContextThemeWrapper(mContext, R.style.CustomAlertDialog));
 
                                     alert.setTitle("Delete");
                                     alert.setMessage("Are you sure you want to delete the selected item ?");
                                     alert.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                         public void onClick(DialogInterface dialog, int which) {
-                                            for (SavedModel s : selectedItems) {
-                                                imagesList.remove(s);
+                                            for (SavedModel s : selItemsTWS) {
+                                                mList.remove(s);
                                                 s.getFile().delete();
                                                 notifyDataSetChanged();
                                             }
@@ -207,21 +224,21 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
 
 
                                 case R.id.menu_select_all:
-                                    if (selectedItems.size() == imagesList.size()) {
-                                        isSelectAll = false;
-                                        selectedItems.clear();
-                                        savedSelectedItemsIds.clear();
+                                    if (selItemsTWS.size() == mList.size()) {
+                                        isSelectedAllTWS = false;
+                                        selItemsTWS.clear();
+                                        sparseBooleanArrayTWS.clear();
                                     } else {
-                                        isSelectAll = true;
-                                        selectedItems.clear();
-                                        selectedItems.addAll(imagesList);
-                                        for (int i = 0; i < imagesList.size(); i++) {
-                                            savedSelectedItemsIds.put(i, true);
+                                        isSelectedAllTWS = true;
+                                        selItemsTWS.clear();
+                                        selItemsTWS.addAll(mList);
+                                        for (int i = 0; i < mList.size(); i++) {
+                                            sparseBooleanArrayTWS.put(i, true);
                                         }
-                                        menu_select_all.setVisible(false);
+                                        mSelALL.setVisible(false);
                                         /*      menu_select_all_2.setVisible(true);*/
                                     }
-                                    savedMainViewModel.setText(String.valueOf(selectedItems.size()));
+                                    mLiveModel.setText(String.valueOf(selItemsTWS.size()));
                                     notifyDataSetChanged();
                                     break;
 
@@ -233,11 +250,11 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
                         @Override
                         public void onDestroyActionMode(ActionMode actionMode) {
 
-                            isEnable = false;
-                            isSelectAll = false;
-                            selectedItems.clear();
+                            isEnableTWS = false;
+                            isSelectedAllTWS = false;
+                            selItemsTWS.clear();
                             notifyDataSetChanged();
-                            savedSelectedItemsIds.clear();
+                            sparseBooleanArrayTWS.clear();
                         }
                     };
 
@@ -253,45 +270,45 @@ public class SavedAdapter extends RecyclerView.Adapter<SavedAdapter.viewHolder> 
 
     @Override
     public int getItemCount() {
-        return imagesList.size();
+        return mList.size();
     }
 
     public class viewHolder extends RecyclerView.ViewHolder {
 
-        RelativeLayout relative_whatsapp, layout_all_check;
-        ImageView img_thumb, btn_download, img_share;
+        RelativeLayout rlMain, selectedItem;
+        ImageView ivThumb, btDownload, ivShare;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
 
 
-            relative_whatsapp = itemView.findViewById(R.id.relative_whatsapp);
-            img_thumb = itemView.findViewById(R.id.thumb_whatsapp);
-            btn_download = itemView.findViewById(R.id.download_whatsapp_btn);
-            img_share = itemView.findViewById(R.id.img_share_whatsapp);
-            layout_all_check = itemView.findViewById(R.id.select_all_layout);
+            rlMain = itemView.findViewById(R.id.rl_main);
+            ivThumb = itemView.findViewById(R.id.thumb_whatsapp);
+            btDownload = itemView.findViewById(R.id.download_whatsapp_btn);
+            ivShare = itemView.findViewById(R.id.img_share_whatsapp);
+            selectedItem = itemView.findViewById(R.id.selected_item);
         }
     }
 
 
     private void SavedClickItem(viewHolder holder, ActionMode mode) {
 
-        SavedModel s = imagesList.get(holder.getAdapterPosition());
-        if (holder.layout_all_check.getVisibility() == View.GONE) {
+        SavedModel s = mList.get(holder.getAdapterPosition());
+        if (holder.selectedItem.getVisibility() == View.GONE) {
 
-            holder.layout_all_check.setVisibility(View.VISIBLE);
-            selectedItems.add(s);
-            savedSelectedItemsIds.put(holder.getAdapterPosition(), true);
+            holder.selectedItem.setVisibility(View.VISIBLE);
+            selItemsTWS.add(s);
+            sparseBooleanArrayTWS.put(holder.getAdapterPosition(), true);
         } else {
-            holder.layout_all_check.setVisibility(View.GONE);
-            selectedItems.remove(s);
-            savedSelectedItemsIds.delete(holder.getAdapterPosition());
+            holder.selectedItem.setVisibility(View.GONE);
+            selItemsTWS.remove(s);
+            sparseBooleanArrayTWS.delete(holder.getAdapterPosition());
 
             if (mode != null) {
                 mode.finish();
 
             }
         }
-        savedMainViewModel.setText(String.valueOf(selectedItems.size()));
+        mLiveModel.setText(String.valueOf(selItemsTWS.size()));
     }
 }

@@ -62,34 +62,34 @@ import java.util.concurrent.ExecutionException;
 
 
 public class ScanActivity extends AppCompatActivity {
-    final Handler handler = new Handler();
+    final Handler handlerTWS = new Handler();
     private RangeSliderView.OnSlideListener listener;
-    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
+    private ListenableFuture<ProcessCameraProvider> cameraFutureTWS;
     ImageAnalysis imageAnalysis;
-    private final int REQUEST_CODE_PERMISSIONS = PointerIconCompat.TYPE_CONTEXT_MENU;
+    private final int REQUEST_CODE_PERMISSIONS_TWS = PointerIconCompat.TYPE_CONTEXT_MENU;
     private final String[] REQUIRED_PERMISSIONS = {"android.permission.CAMERA"};
-    ProcessCameraProvider cameraProvider;
-    CameraSelector cameraSelector;
+    ProcessCameraProvider camProvTWS;
+    CameraSelector camSelTWS;
     boolean capture = false;
-    int facing = 0;
-    int frameRate = 30;
-    boolean isSwitching = false;
-    int lineCount = 0;
-    int lineResolution = 2;
+    int facingTWS = 0;
+    int frRateTWS = 30;
+    boolean isSwitchingTWS = false;
+    int lCntTWS = 0;
+    int lResTWS = 2;
     Camera mCamera;
-    Preview preview;
-    int resolutionX = 360;
-    int resolutionY = 640;
-    Bitmap resultBitmap = null;
-    List<Bitmap> resultBitmapList = null;
-    Bitmap subBitmap = null;
-    public WARP_DIRECTION warpDirection = WARP_DIRECTION.DOWN;
+    Preview mPreview;
+    int resXTWS = 360;
+    int resYTWS = 640;
+    Bitmap resBmpTWS = null;
+    List<Bitmap> resBmpListTWS = null;
+    Bitmap subBmpTWS = null;
+    public WRP_DIR_TWS directionTWS = WRP_DIR_TWS.DOWN;
     private String direction = "horizontal";
     private int brightness = 0;
     private boolean isSeekBarTracking = false;
 
 
-    public enum WARP_DIRECTION {
+    public enum WRP_DIR_TWS {
         DOWN,
         RIGHT
     }
@@ -111,11 +111,11 @@ public class ScanActivity extends AppCompatActivity {
     private void initItems() {
         Utils.makeDir(ScanActivity.this);
         binding.peekIdPreview.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
-        cameraProviderFuture = ProcessCameraProvider.getInstance(this);
+        cameraFutureTWS = ProcessCameraProvider.getInstance(this);
         ImageAnalysis build = new ImageAnalysis.Builder().setTargetResolution(new Size(360, 640)).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
         imageAnalysis = build;
         build.setAnalyzer(ContextCompat.getMainExecutor(this), new ImgCap());
-        cameraProviderFuture.addListener(ScanActivity.this::cameraPermission, ContextCompat.getMainExecutor(this));
+        cameraFutureTWS.addListener(ScanActivity.this::cameraPermission, ContextCompat.getMainExecutor(this));
 
         if (direction.equals("horizontal")) {
             binding.horizontalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.selected_ort_bg)));
@@ -134,8 +134,8 @@ public class ScanActivity extends AppCompatActivity {
 
     private void changeListeners() {
         listener = index -> {
-            frameRate = 120 - ((index + 1) * 20);
-            handler.postDelayed(() -> {
+            frRateTWS = 120 - ((index + 1) * 20);
+            handlerTWS.postDelayed(() -> {
                 binding.rangeID.setVisibility(View.INVISIBLE);
             }, 3000);
         };
@@ -148,14 +148,16 @@ public class ScanActivity extends AppCompatActivity {
                 Settings.System.putInt(getContentResolver(),
                         Settings.System.SCREEN_BRIGHTNESS, progress);
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 isSeekBarTracking = true;
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 isSeekBarTracking = false;
-                handler.postDelayed(() -> {
+                handlerTWS.postDelayed(() -> {
                     if (!isSeekBarTracking) {
                         binding.seekBarContainer.setVisibility(View.INVISIBLE);
                     }
@@ -175,7 +177,7 @@ public class ScanActivity extends AppCompatActivity {
 
                 if (Settings.System.canWrite(this)) {
                     binding.seekBarContainer.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
                     intent.setData(Uri.parse("package:" + getPackageName()));
                     startActivity(intent);
@@ -217,14 +219,14 @@ public class ScanActivity extends AppCompatActivity {
 
         binding.peekIdResultSave.setOnClickListener(view -> {
             String fileTitle = System.currentTimeMillis() + ".jpeg";
-            saveToInternalStorage(resultBitmap, fileTitle);
+            saveToInternalStorage(resBmpTWS, fileTitle);
             Toast.makeText(ScanActivity.this, "Photo Saved", Toast.LENGTH_SHORT).show();
             cancelButtonFunctions(view);
             Int_AD_TWS.getInstance(this).showAd_WA(ScanActivity.this);
         });
-        this.resultBitmapList = new ArrayList();
-        this.resolutionY = 640;
-        this.resolutionX = 360;
+        this.resBmpListTWS = new ArrayList();
+        this.resYTWS = 640;
+        this.resXTWS = 360;
     }
 
 
@@ -243,7 +245,7 @@ public class ScanActivity extends AppCompatActivity {
                                         binding.verticalBtn.setTextColor(getResources().getColor(R.color.yellow));
                                         binding.horizontalBtn.setBackground(getTintedDrawable(getResources(), R.drawable.selected_ort_bg));
                                         binding.verticalBtn.setBackground(Objects.requireNonNull(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg)));
-                                        startCapture(WARP_DIRECTION.RIGHT);
+                                        startCapture(WRP_DIR_TWS.RIGHT);
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
                                     }
@@ -254,7 +256,7 @@ public class ScanActivity extends AppCompatActivity {
                                         binding.verticalBtn.setBackground(getTintedDrawable(getResources(), R.drawable.selected_ort_bg));
                                         binding.horizontalBtn.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.unselected_ort_bg));
 
-                                        startCapture(WARP_DIRECTION.DOWN);
+                                        startCapture(WRP_DIR_TWS.DOWN);
 
                                     } catch (InterruptedException e) {
                                         e.printStackTrace();
@@ -301,11 +303,11 @@ public class ScanActivity extends AppCompatActivity {
 
     public void cameraPermission() {
         try {
-            this.cameraProvider = (ProcessCameraProvider) this.cameraProviderFuture.get();
+            this.camProvTWS = (ProcessCameraProvider) this.cameraFutureTWS.get();
             if (allPermissionsGranted()) {
-                bindPreview(this.cameraProvider);
+                bindPreview(this.camProvTWS);
             } else {
-                ActivityCompat.requestPermissions(this, this.REQUIRED_PERMISSIONS, this.REQUEST_CODE_PERMISSIONS);
+                ActivityCompat.requestPermissions(this, this.REQUIRED_PERMISSIONS, this.REQUEST_CODE_PERMISSIONS_TWS);
             }
         } catch (InterruptedException | ExecutionException ignored) {
         }
@@ -317,14 +319,14 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     public void CameraSwitching(View view) {
-        this.isSwitching = true;
-        if (this.facing == 0) {
+        this.isSwitchingTWS = true;
+        if (this.facingTWS == 0) {
             setFacing(1);
         } else {
             setFacing(0);
         }
-        bindPreview(this.cameraProvider);
-        this.isSwitching = false;
+        bindPreview(this.camProvTWS);
+        this.isSwitchingTWS = false;
     }
 
     private boolean allPermissionsGranted() {
@@ -338,9 +340,9 @@ public class ScanActivity extends AppCompatActivity {
 
     public void onRequestPermissionsResult(int i, String[] strArr, int[] iArr) {
         super.onRequestPermissionsResult(i, strArr, iArr);
-        if (i == this.REQUEST_CODE_PERMISSIONS) {
+        if (i == this.REQUEST_CODE_PERMISSIONS_TWS) {
             if (allPermissionsGranted()) {
-                bindPreview(this.cameraProvider);
+                bindPreview(this.camProvTWS);
                 return;
             }
             Toast.makeText(this, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
@@ -349,18 +351,18 @@ public class ScanActivity extends AppCompatActivity {
     }
 
     private void setFacing(int i) {
-        this.facing = i;
+        this.facingTWS = i;
     }
 
-    public Bitmap overlay(Bitmap bitmap, Bitmap bitmap2, int i, WARP_DIRECTION warp_direction) {
+    public Bitmap overlay(Bitmap bitmap, Bitmap bitmap2, int i, WRP_DIR_TWS warp_direction) {
         new Matrix().preScale(1.0f, -1.0f);
         Bitmap createBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
         Canvas canvas = new Canvas(createBitmap);
         canvas.drawBitmap(bitmap, new Matrix(), (Paint) null);
-        if (warp_direction == WARP_DIRECTION.DOWN) {
+        if (warp_direction == WRP_DIR_TWS.DOWN) {
             canvas.drawBitmap(bitmap2, 0.0f, (float) i, (Paint) null);
         }
-        if (warp_direction == WARP_DIRECTION.RIGHT) {
+        if (warp_direction == WRP_DIR_TWS.RIGHT) {
             canvas.drawBitmap(bitmap2, (float) i, 0.0f, (Paint) null);
         }
         return createBitmap;
@@ -380,7 +382,7 @@ public class ScanActivity extends AppCompatActivity {
     }
 
 
-    public void drawScanEffect(Bitmap bitmap, WARP_DIRECTION warp_direction, int i) {
+    public void drawScanEffect(Bitmap bitmap, WRP_DIR_TWS warp_direction, int i) {
         Canvas canvas = new Canvas(bitmap);
         Paint paint = new Paint();
         paint.setStrokeWidth(5.0f);
@@ -389,10 +391,10 @@ public class ScanActivity extends AppCompatActivity {
         } else {
             paint.setColor(-1);
         }
-        if (warp_direction == WARP_DIRECTION.DOWN) {
+        if (warp_direction == WRP_DIR_TWS.DOWN) {
             float f = (float) (i + 5);
             canvas.drawLine(0.0f, f, (float) bitmap.getWidth(), f, paint);
-        } else if (warp_direction == WARP_DIRECTION.RIGHT) {
+        } else if (warp_direction == WRP_DIR_TWS.RIGHT) {
             float f2 = (float) (i + 5);
             canvas.drawLine(f2, 0.0f, f2, (float) bitmap.getHeight(), paint);
         }
@@ -401,10 +403,10 @@ public class ScanActivity extends AppCompatActivity {
 
 
     public void initializeImageView() {
-        Bitmap createBitmap = Bitmap.createBitmap(this.resolutionX, this.resolutionY, Bitmap.Config.ARGB_8888);
-        this.resultBitmap = createBitmap;
+        Bitmap createBitmap = Bitmap.createBitmap(this.resXTWS, this.resYTWS, Bitmap.Config.ARGB_8888);
+        this.resBmpTWS = createBitmap;
         createBitmap.eraseColor(0);
-        binding.peekIdResultImageview.setImageBitmap(this.resultBitmap);
+        binding.peekIdResultImageview.setImageBitmap(this.resBmpTWS);
     }
 
 
@@ -435,9 +437,9 @@ public class ScanActivity extends AppCompatActivity {
 
 
     private void resumeToBeforeCaptureUI() {
-        this.lineCount = 0;
-        this.resultBitmap = null;
-        this.resultBitmapList = null;
+        this.lCntTWS = 0;
+        this.resBmpTWS = null;
+        this.resBmpListTWS = null;
         initializeImageView();
         hideResultUI();
         showBeforeCaptureUI();
@@ -445,12 +447,12 @@ public class ScanActivity extends AppCompatActivity {
     }
 
 
-    public void startCapture(WARP_DIRECTION warp_direction) throws InterruptedException {
-        this.warpDirection = warp_direction;
-        this.lineResolution = 2;
-        this.lineCount = 0;
-        this.resultBitmap = null;
-        this.resultBitmapList = null;
+    public void startCapture(WRP_DIR_TWS warp_direction) throws InterruptedException {
+        this.directionTWS = warp_direction;
+        this.lResTWS = 2;
+        this.lCntTWS = 0;
+        this.resBmpTWS = null;
+        this.resBmpListTWS = null;
         initializeImageView();
         hideResultUI();
         hideBeforeCaptureUI();
@@ -458,19 +460,19 @@ public class ScanActivity extends AppCompatActivity {
     }
 
 
-    public Bitmap toBitmap(Image image) {
-        Image.Plane[] planes = image.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
-        ByteBuffer buffer2 = planes[1].getBuffer();
-        ByteBuffer buffer3 = planes[2].getBuffer();
-        int remaining = buffer.remaining();
-        int remaining2 = buffer2.remaining();
-        int remaining3 = buffer3.remaining();
-        byte[] bArr = new byte[(remaining + remaining2 + remaining3)];
-        buffer.get(bArr, 0, remaining);
-        buffer3.get(bArr, remaining, remaining3);
-        buffer2.get(bArr, remaining + remaining3, remaining2);
-        YuvImage yuvImage = new YuvImage(bArr, 17, image.getWidth(), image.getHeight(), (int[]) null);
+    public Bitmap toBitmapTWS(Image image) {
+        Image.Plane[] pl = image.getPlanes();
+        ByteBuffer bf = pl[0].getBuffer();
+        ByteBuffer bf2 = pl[1].getBuffer();
+        ByteBuffer bf3 = pl[2].getBuffer();
+        int remaining = bf.remaining();
+        int remaining2 = bf2.remaining();
+        int remaining3 = bf3.remaining();
+        byte[] bArrTSW = new byte[(remaining + remaining2 + remaining3)];
+        bf.get(bArrTSW, 0, remaining);
+        bf3.get(bArrTSW, remaining, remaining3);
+        bf2.get(bArrTSW, remaining + remaining3, remaining2);
+        YuvImage yuvImage = new YuvImage(bArrTSW, 17, image.getWidth(), image.getHeight(), (int[]) null);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 75, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
@@ -479,15 +481,19 @@ public class ScanActivity extends AppCompatActivity {
 
 
     public void bindPreview(ProcessCameraProvider processCameraProvider) {
-        processCameraProvider.unbindAll();
-        this.preview = new Preview.Builder().setTargetResolution(new Size(360, 640)).build();
-        this.cameraSelector = new CameraSelector.Builder().requireLensFacing(this.facing).build();
-        ImageAnalysis build = new ImageAnalysis.Builder().setTargetResolution(new Size(360, 640)).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
-        this.imageAnalysis = build;
-        build.setAnalyzer(ContextCompat.getMainExecutor(this), new ImgCap());
-        this.preview.setSurfaceProvider(binding.peekIdPreview.getSurfaceProvider());
-        this.mCamera = processCameraProvider.bindToLifecycle((LifecycleOwner) this, this.cameraSelector, this.preview);
-        processCameraProvider.bindToLifecycle((LifecycleOwner) this, this.cameraSelector, this.imageAnalysis, this.preview);
+        try {
+            processCameraProvider.unbindAll();
+            this.mPreview = new Preview.Builder().setTargetResolution(new Size(360, 640)).build();
+            this.camSelTWS = new CameraSelector.Builder().requireLensFacing(this.facingTWS).build();
+            ImageAnalysis build = new ImageAnalysis.Builder().setTargetResolution(new Size(360, 640)).setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
+            this.imageAnalysis = build;
+            build.setAnalyzer(ContextCompat.getMainExecutor(this), new ImgCap());
+            this.mPreview.setSurfaceProvider(binding.peekIdPreview.getSurfaceProvider());
+            this.mCamera = processCameraProvider.bindToLifecycle((LifecycleOwner) this, this.camSelTWS, this.mPreview);
+            processCameraProvider.bindToLifecycle((LifecycleOwner) this, this.camSelTWS, this.imageAnalysis, this.mPreview);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -497,74 +503,86 @@ public class ScanActivity extends AppCompatActivity {
 
         @SuppressLint("UnsafeOptInUsageError")
         public void analyze(ImageProxy imageProxy) {
-            Bitmap bitmap;
-            if (binding.peekIdPreview.getPreviewStreamState().getValue() == PreviewView.StreamState.STREAMING && binding.peekIdPreview.getChildAt(0).getClass() == TextureView.class) {
-                bitmap = ((TextureView) binding.peekIdPreview.getChildAt(0)).getBitmap(ScanActivity.this.resolutionX, ScanActivity.this.resolutionY);
-            } else if (imageProxy.getFormat() == 35) {
-                ScanActivity scanActivity = ScanActivity.this;
-                bitmap = scanActivity.rotateBitmap(scanActivity.toBitmap(imageProxy.getImage()), 90);
-                if (ScanActivity.this.facing == 0) {
-                    bitmap = ScanActivity.MirrorBitmap(bitmap, 1, -1);
+            try {
+                Bitmap bitmap;
+                if (binding.peekIdPreview.getPreviewStreamState().getValue() == PreviewView.StreamState.STREAMING && binding.peekIdPreview.getChildAt(0).getClass() == TextureView.class) {
+                    bitmap = ((TextureView) binding.peekIdPreview.getChildAt(0)).getBitmap(ScanActivity.this.resXTWS, ScanActivity.this.resYTWS);
+                } else if (imageProxy.getFormat() == 35) {
+                    ScanActivity scanActivity = ScanActivity.this;
+                    bitmap = scanActivity.rotateBitmap(scanActivity.toBitmapTWS(imageProxy.getImage()), 90);
+                    if (ScanActivity.this.facingTWS == 0) {
+                        bitmap = ScanActivity.MirrorBitmap(bitmap, 1, -1);
+                    }
+                } else {
+                    bitmap = null;
                 }
-            } else {
-                bitmap = null;
-            }
-            if (bitmap == null) {
-                imageProxy.close();
-                return;
-            }
-            if ((ScanActivity.this.lineCount >= ScanActivity.this.resolutionY || ScanActivity.this.warpDirection != WARP_DIRECTION.DOWN) && !((ScanActivity.this.lineCount < ScanActivity.this.resolutionX && ScanActivity.this.warpDirection == WARP_DIRECTION.RIGHT && ScanActivity.this.facing == 0) || (ScanActivity.this.lineCount < ScanActivity.this.resolutionX && ScanActivity.this.warpDirection == WARP_DIRECTION.RIGHT && ScanActivity.this.facing == 1))) {
-                if (ScanActivity.this.capture) {
-                    ScanActivity.this.stopCapture();
+                if (bitmap == null) {
+                    imageProxy.close();
+                    return;
                 }
-            } else if (ScanActivity.this.capture) {
-                long currentTimeMillis = System.currentTimeMillis();
-                if (ScanActivity.this.resultBitmap == null) {
-                    ScanActivity.this.initializeImageView();
-                }
-                if (ScanActivity.this.resultBitmapList == null) {
-                    ScanActivity.this.resultBitmapList = new ArrayList();
-                }
-                if (ScanActivity.this.warpDirection == WARP_DIRECTION.DOWN) {
-                    ScanActivity scanActivity3 = ScanActivity.this;
-                    scanActivity3.subBitmap = Bitmap.createBitmap(bitmap, 0, scanActivity3.lineCount, ScanActivity.this.resolutionX, ScanActivity.this.lineResolution);
-                } else if (ScanActivity.this.warpDirection == WARP_DIRECTION.RIGHT) {
-                    ScanActivity scanActivity4 = ScanActivity.this;
-                    scanActivity4.subBitmap = Bitmap.createBitmap(bitmap, scanActivity4.lineCount, 0, ScanActivity.this.lineResolution, ScanActivity.this.resolutionY);
-                }
-                ScanActivity scanActivity5 = ScanActivity.this;
-                scanActivity5.resultBitmap = scanActivity5.overlay(scanActivity5.resultBitmap, ScanActivity.this.subBitmap, ScanActivity.this.lineCount, ScanActivity.this.warpDirection);
-                binding.peekIdResultImageview.setImageBitmap(ScanActivity.this.resultBitmap);
-                ScanActivity scanActivity8 = ScanActivity.this;
-                scanActivity8.drawScanEffect(bitmap, scanActivity8.warpDirection, ScanActivity.this.lineCount);
-                ScanActivity.this.lineCount += ScanActivity.this.lineResolution;
-                long currentTimeMillis2 = currentTimeMillis - System.currentTimeMillis();
-                if (currentTimeMillis2 < ((long) ScanActivity.this.frameRate)) {
-                    try {
-                        Thread.sleep(((long) ScanActivity.this.frameRate) - currentTimeMillis2);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                if ((ScanActivity.this.lCntTWS >= ScanActivity.this.resYTWS || ScanActivity.this.directionTWS != WRP_DIR_TWS.DOWN) && !((ScanActivity.this.lCntTWS < ScanActivity.this.resXTWS && ScanActivity.this.directionTWS == WRP_DIR_TWS.RIGHT && ScanActivity.this.facingTWS == 0) || (ScanActivity.this.lCntTWS < ScanActivity.this.resXTWS && ScanActivity.this.directionTWS == WRP_DIR_TWS.RIGHT && ScanActivity.this.facingTWS == 1))) {
+                    if (ScanActivity.this.capture) {
+                        ScanActivity.this.stopCapture();
+                    }
+                } else if (ScanActivity.this.capture) {
+                    long currentTimeMillis = System.currentTimeMillis();
+                    if (ScanActivity.this.resBmpTWS == null) {
+                        ScanActivity.this.initializeImageView();
+                    }
+                    if (ScanActivity.this.resBmpListTWS == null) {
+                        ScanActivity.this.resBmpListTWS = new ArrayList();
+                    }
+                    if (ScanActivity.this.directionTWS == WRP_DIR_TWS.DOWN) {
+                        ScanActivity scanActivity3 = ScanActivity.this;
+                        scanActivity3.subBmpTWS = Bitmap.createBitmap(bitmap, 0, scanActivity3.lCntTWS, ScanActivity.this.resXTWS, ScanActivity.this.lResTWS);
+                    } else if (ScanActivity.this.directionTWS == WRP_DIR_TWS.RIGHT) {
+                        ScanActivity scanActivity4 = ScanActivity.this;
+                        scanActivity4.subBmpTWS = Bitmap.createBitmap(bitmap, scanActivity4.lCntTWS, 0, ScanActivity.this.lResTWS, ScanActivity.this.resYTWS);
+                    }
+                    ScanActivity scanActivity5 = ScanActivity.this;
+                    scanActivity5.resBmpTWS = scanActivity5.overlay(scanActivity5.resBmpTWS, ScanActivity.this.subBmpTWS, ScanActivity.this.lCntTWS, ScanActivity.this.directionTWS);
+                    binding.peekIdResultImageview.setImageBitmap(ScanActivity.this.resBmpTWS);
+                    ScanActivity scanActivity8 = ScanActivity.this;
+                    scanActivity8.drawScanEffect(bitmap, scanActivity8.directionTWS, ScanActivity.this.lCntTWS);
+                    ScanActivity.this.lCntTWS += ScanActivity.this.lResTWS;
+                    long currentTimeMillis2 = currentTimeMillis - System.currentTimeMillis();
+                    if (currentTimeMillis2 < ((long) ScanActivity.this.frRateTWS)) {
+                        try {
+                            Thread.sleep(((long) ScanActivity.this.frRateTWS) - currentTimeMillis2);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
+                binding.peekIdPreviewImageview.setImageBitmap(bitmap);
+                imageProxy.close();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
             }
-            binding.peekIdPreviewImageview.setImageBitmap(bitmap);
-            imageProxy.close();
         }
     }
 
 
     public void stopCapture() {
-        if ((this.lineCount == this.resolutionY && this.warpDirection == WARP_DIRECTION.DOWN) || (this.lineCount == this.resolutionX && this.warpDirection == WARP_DIRECTION.RIGHT)) {
-            showResultUI();
+        try {
+            if ((this.lCntTWS == this.resYTWS && this.directionTWS == WRP_DIR_TWS.DOWN) || (this.lCntTWS == this.resXTWS && this.directionTWS == WRP_DIR_TWS.RIGHT)) {
+                showResultUI();
+            }
+            this.capture = false;
+        } catch (RuntimeException e) {
+            e.printStackTrace();
         }
-        this.capture = false;
     }
 
     public void onBackPressed() {
-        if (binding.peekIdBottomLl.getVisibility() == View.VISIBLE) {
-            finish();
-        } else {
-            resumeToBeforeCaptureUI();
+        try {
+            if (binding.peekIdBottomLl.getVisibility() == View.VISIBLE) {
+                finish();
+            } else {
+                resumeToBeforeCaptureUI();
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
         }
     }
 

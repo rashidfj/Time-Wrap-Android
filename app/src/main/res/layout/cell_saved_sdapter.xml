@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/relative_whatsapp"
+    android:id="@+id/rl_main"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp">
@@ -30,10 +30,10 @@
                 android:src="@drawable/ic_launcher_background" />
 
             <RelativeLayout
-                android:id="@+id/select_all_layout"
+                android:id="@+id/selected_item"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#A403A9F4"
+                android:background="@color/item_6"
                 android:visibility="gone"
                 />
 
