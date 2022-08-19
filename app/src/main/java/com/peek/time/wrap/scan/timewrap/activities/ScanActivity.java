@@ -387,7 +387,7 @@ public class ScanActivity extends AppCompatActivity {
         Paint paint = new Paint();
         paint.setStrokeWidth(5.0f);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            paint.setColor(getColor(R.color.yellow));
+            paint.setColor(getColor(R.color.lineColor));
         } else {
             paint.setColor(-1);
         }

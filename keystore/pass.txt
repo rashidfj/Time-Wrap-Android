@@ -1,0 +1,3 @@
+keypassword '12345678'
+keyAlias 'timewarapkey'
+privacylink 'https://peekhelpers.com/time-warp-scan/privacy-policy'
